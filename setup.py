@@ -45,7 +45,7 @@ def pkgconfig_installed_check(lib:str, version:str = BROTLI_REQUIRED_VERSION, de
     installed = pkgconfig_installed(lib, version)
     print(f"Checking for {lib} installed: {installed}")
 
-    if not default_installed:
+    if not installed:
       raise Exception(f"Required library {lib} not found")
 
     return installed
