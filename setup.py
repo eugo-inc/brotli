@@ -65,9 +65,9 @@ for lib in libs:
   extension_kwargs = pkgconfig_parse(lib)
   print(f"Extension kwargs: {extension_kwargs}")
 
-  ext_kwarg_libraries.append(lib)
+  # ext_kwarg_libraries.append(lib)
 
-extension_kwargs['libraries'] = ext_kwarg_libraries
+extension_kwargs['libraries'] = ['libbrotli']
 
 CURR_DIR = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 
