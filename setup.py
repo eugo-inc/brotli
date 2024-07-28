@@ -41,14 +41,15 @@ def pkgconfig_installed_check(lib:str, required_version:str, default_installed:b
 
     return installed
 
-libbrotlidec_found = pkgconfig_installed_check('libbrotlidec', BROTLI_REQUIRED_VERSION)
-libbrotlienc_found = pkgconfig_installed_check('libbrotlienc', BROTLI_REQUIRED_VERSION)
-libbrotlicommon_found = pkgconfig_installed_check('libbrotlicommon', BROTLI_REQUIRED_VERSION)
+# libbrotlidec_found = pkgconfig_installed_check('libbrotlidec', BROTLI_REQUIRED_VERSION)
+# libbrotlienc_found = pkgconfig_installed_check('libbrotlienc', BROTLI_REQUIRED_VERSION)
+# libbrotlicommon_found = pkgconfig_installed_check('libbrotlicommon', BROTLI_REQUIRED_VERSION)
 libbrotli_found = pkgconfig_installed_check('libbrotli', BROTLI_REQUIRED_VERSION)
 
 extension_kwargs = pkgconfig_parse('libbrotli')
 print(extension_kwargs)
-extension_kwargs['libraries'] = ['libbrotlidec', 'libbrotlienc', 'libbrotlicommon', 'libbrotli']
+# extension_kwargs['libraries'] = ['libbrotlidec', 'libbrotlienc', 'libbrotlicommon', 'libbrotli']
+extension_kwargs['libraries'] = ['libbrotli']
 
 CURR_DIR = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 
