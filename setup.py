@@ -91,7 +91,7 @@ def _find_system_libraries(libs: list[str]) -> None:
 _find_system_libraries(libs)
 
 ext_kwargs['libraries'] = ext_kwarg_libraries
-
+logger.info(f"Extension kwargs: {ext_kwargs}")
 
 
 CURR_DIR = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
