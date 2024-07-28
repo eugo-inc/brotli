@@ -34,6 +34,18 @@ from pkgconfig import parse as pkgconfig_parse
 
 def pkgconfig_installed_check(lib:str, default_installed:bool = False) -> bool:
     installed = default_installed
+
+
+    packages = pkgconfig.list_all()
+    print(f"Checking for packages: {packages}")
+
+    exists = pkgconfig.exists('libbrotli')
+    print(f"Checking if libbrotli exists: {exists}")
+
+
+    version = pkgconfig.modversion('libbrotli')
+    print(f"Checking version: {version}")
+
     installed = pkgconfig_installed(lib)
 
     print(f"Checking for {lib} installed: {installed}")
