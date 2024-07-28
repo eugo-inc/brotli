@@ -20,7 +20,7 @@ from distutils import dep_util
 from distutils import log
 
 
-BROTLI_REQUIRED_VERSION = '= d01a4caaa80c0072fe1b6bf073814b9400667fcc'
+BROTLI_REQUIRED_VERSION = '>= 1.0.9'
 
 # Check to see if we have a suitable libbrotli libraries installed on the system
 libbrotlidec_found = False
@@ -33,27 +33,16 @@ from pkgconfig import installed as pkgconfig_installed
 from pkgconfig import parse as pkgconfig_parse
 import pkgconfig
 
-def pkgconfig_installed_check(lib:str, default_installed:bool = False) -> bool:
+def pkgconfig_installed_check(lib:str, version:str = BROTLI_REQUIRED_VERSION, default_installed:bool = False) -> bool:
     installed = default_installed
 
+    exists = pkgconfig.exists(lib)
+    print(f"Checking if {lib} exists: {exists}")
 
-    packages = pkgconfig.list_all()
-    print(f"Checking for packages: {packages}")
+    version = pkgconfig.modversion(lib)
+    print(f"Checking lib {lib} version: {version}")
 
-    for package in packages:
-
-      exists = pkgconfig.exists(package)
-      print(f"Checking if libbrotli exists: {exists}")
-
-      version = pkgconfig.modversion(package)
-      print(f"Checking version: {version}")
-
-      import sys
-
-      sys.exit(1)
-
-    installed = pkgconfig_installed(lib)
-
+    installed = pkgconfig_installed(lib, version)
     print(f"Checking for {lib} installed: {installed}")
 
     if not default_installed:
@@ -61,15 +50,24 @@ def pkgconfig_installed_check(lib:str, default_installed:bool = False) -> bool:
 
     return installed
 
-# libbrotlidec_found = pkgconfig_installed_check('libbrotlidec', BROTLI_REQUIRED_VERSION)
-# libbrotlienc_found = pkgconfig_installed_check('libbrotlienc', BROTLI_REQUIRED_VERSION)
-# libbrotlicommon_found = pkgconfig_installed_check('libbrotlicommon', BROTLI_REQUIRED_VERSION)
-libbrotli_found = pkgconfig_installed_check('libbrotli')
 
-extension_kwargs = pkgconfig_parse('libbrotli')
-print(f"Extension kwargs: {extension_kwargs}")
-# extension_kwargs['libraries'] = ['libbrotlidec', 'libbrotlienc', 'libbrotlicommon', 'libbrotli']
-extension_kwargs['libraries'] = ['libbrotli']
+libs = ['libbrotlidec', 'libbrotlienc', 'libbrotlicommon']
+extension_kwargs = {}
+ext_kwarg_libraries = []
+
+for lib in libs:
+  libbrotlidec_found = pkgconfig_installed_check(lib, BROTLI_REQUIRED_VERSION)
+  libbrotlienc_found = pkgconfig_installed_check(lib, BROTLI_REQUIRED_VERSION)
+  libbrotlicommon_found = pkgconfig_installed_check(lib, BROTLI_REQUIRED_VERSION)
+
+  extension_kwargs = pkgconfig_parse(lib)
+  extension_kwargs = pkgconfig_parse(lib)
+  extension_kwargs = pkgconfig_parse(lib)
+  print(f"Extension kwargs: {extension_kwargs}")
+
+  ext_kwarg_libraries.append(lib)
+
+extension_kwargs['libraries'] = ext_kwarg_libraries
 
 CURR_DIR = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 
