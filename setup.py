@@ -20,6 +20,29 @@ from distutils import dep_util
 from distutils import log
 
 
+BROTLI_REQUIRED_VERSION = '= d01a4caaa80c0072fe1b6bf073814b9400667fcc'
+
+# Check to see if we have a suitable libbrotli libraries installed on the system
+libbrotlidec_found = False
+libbrotlienc_found = False
+libbrotlicommon_found = False
+
+
+from pkgconfig import installed as pkgconfig_installed
+from pkgconfig import parse as pkgconfig_parse
+
+def pkgconfig_installed_check(lib:str, required_version:str, default_installed:bool = False) -> bool:
+    installed = default_installed
+    installed = pkgconfig_installed(lib, required_version)
+    return installed
+
+libbrotlidec_found = pkgconfig_installed_check('libbrotlidec', BROTLI_REQUIRED_VERSION)
+libbrotlienc_found = pkgconfig_installed_check('libbrotlienc', BROTLI_REQUIRED_VERSION)
+libbrotlicommon_found = pkgconfig_installed_check('libbrotlicommon', BROTLI_REQUIRED_VERSION)
+
+extension_kwargs = pkgconfig_parse('liblz4')
+extension_kwargs['libraries'] = ['libbrotlidec', 'libbrotlienc', 'libbrotlicommon']
+
 CURR_DIR = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 
 
@@ -177,97 +200,8 @@ EXT_MODULES = [
         '_brotli',
         sources=[
             'python/_brotli.c',
-            'c/common/constants.c',
-            'c/common/context.c',
-            'c/common/dictionary.c',
-            'c/common/platform.c',
-            'c/common/shared_dictionary.c',
-            'c/common/transform.c',
-            'c/dec/bit_reader.c',
-            'c/dec/decode.c',
-            'c/dec/huffman.c',
-            'c/dec/state.c',
-            'c/enc/backward_references.c',
-            'c/enc/backward_references_hq.c',
-            'c/enc/bit_cost.c',
-            'c/enc/block_splitter.c',
-            'c/enc/brotli_bit_stream.c',
-            'c/enc/cluster.c',
-            'c/enc/command.c',
-            'c/enc/compound_dictionary.c',
-            'c/enc/compress_fragment.c',
-            'c/enc/compress_fragment_two_pass.c',
-            'c/enc/dictionary_hash.c',
-            'c/enc/encode.c',
-            'c/enc/encoder_dict.c',
-            'c/enc/entropy_encode.c',
-            'c/enc/fast_log.c',
-            'c/enc/histogram.c',
-            'c/enc/literal_cost.c',
-            'c/enc/memory.c',
-            'c/enc/metablock.c',
-            'c/enc/static_dict.c',
-            'c/enc/utf8_util.c',
-        ],
-        depends=[
-            'c/common/constants.h',
-            'c/common/context.h',
-            'c/common/dictionary.h',
-            'c/common/platform.h',
-            'c/common/shared_dictionary_internal.h',
-            'c/common/transform.h',
-            'c/common/version.h',
-            'c/dec/bit_reader.h',
-            'c/dec/huffman.h',
-            'c/dec/prefix.h',
-            'c/dec/state.h',
-            'c/enc/backward_references.h',
-            'c/enc/backward_references_hq.h',
-            'c/enc/backward_references_inc.h',
-            'c/enc/bit_cost.h',
-            'c/enc/bit_cost_inc.h',
-            'c/enc/block_encoder_inc.h',
-            'c/enc/block_splitter.h',
-            'c/enc/block_splitter_inc.h',
-            'c/enc/brotli_bit_stream.h',
-            'c/enc/cluster.h',
-            'c/enc/cluster_inc.h',
-            'c/enc/command.h',
-            'c/enc/compound_dictionary.h',
-            'c/enc/compress_fragment.h',
-            'c/enc/compress_fragment_two_pass.h',
-            'c/enc/dictionary_hash.h',
-            'c/enc/encoder_dict.h',
-            'c/enc/entropy_encode.h',
-            'c/enc/entropy_encode_static.h',
-            'c/enc/fast_log.h',
-            'c/enc/find_match_length.h',
-            'c/enc/hash.h',
-            'c/enc/hash_composite_inc.h',
-            'c/enc/hash_forgetful_chain_inc.h',
-            'c/enc/hash_longest_match64_inc.h',
-            'c/enc/hash_longest_match_inc.h',
-            'c/enc/hash_longest_match_quickly_inc.h',
-            'c/enc/hash_rolling_inc.h',
-            'c/enc/hash_to_binary_tree_inc.h',
-            'c/enc/histogram.h',
-            'c/enc/histogram_inc.h',
-            'c/enc/literal_cost.h',
-            'c/enc/memory.h',
-            'c/enc/metablock.h',
-            'c/enc/metablock_inc.h',
-            'c/enc/params.h',
-            'c/enc/prefix.h',
-            'c/enc/quality.h',
-            'c/enc/ringbuffer.h',
-            'c/enc/static_dict.h',
-            'c/enc/static_dict_lut.h',
-            'c/enc/utf8_util.h',
-            'c/enc/write_bits.h',
-        ],
-        include_dirs=[
-            'c/include',
-        ]),
+            ],
+        **extension_kwargs),
 ]
 
 TEST_SUITE = 'setup.get_test_suite'
