@@ -52,6 +52,7 @@ def pkgconfig_installed_check(lib:str, version:str = BROTLI_REQUIRED_VERSION, de
 
 
 libs = ['libbrotlidec', 'libbrotlienc', 'libbrotlicommon']
+libs_no_lib = ['brotlidec', 'brotlienc', 'brotlicommon']
 extension_kwargs = {}
 ext_kwarg_libraries = []
 
@@ -65,8 +66,8 @@ for lib in libs:
   extension_kwargs = pkgconfig_parse(lib)
   print(f"Extension kwargs: {extension_kwargs}")
 
-  # ext_kwarg_libraries.append(['brotlidec', 'brotlienc', 'brotlicommon'])
-  ext_kwarg_libraries.append(['brotlicommon'])
+  for p in libs_no_lib:
+    ext_kwarg_libraries.append(p)
 
 extension_kwargs['libraries'] = ext_kwarg_libraries
 
