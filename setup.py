@@ -31,6 +31,7 @@ libbrotli_found = True
 
 from pkgconfig import installed as pkgconfig_installed
 from pkgconfig import parse as pkgconfig_parse
+import pkgconfig
 
 def pkgconfig_installed_check(lib:str, default_installed:bool = False) -> bool:
     installed = default_installed
