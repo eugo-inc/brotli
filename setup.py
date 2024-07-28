@@ -32,9 +32,9 @@ libbrotli_found = True
 from pkgconfig import installed as pkgconfig_installed
 from pkgconfig import parse as pkgconfig_parse
 
-def pkgconfig_installed_check(lib:str, required_version:str, default_installed:bool = False) -> bool:
+def pkgconfig_installed_check(lib:str, default_installed:bool = False) -> bool:
     installed = default_installed
-    installed = pkgconfig_installed(lib, required_version)
+    installed = pkgconfig_installed(lib)
 
     print(f"Checking for {lib} installed: {installed}")
 
@@ -46,9 +46,10 @@ def pkgconfig_installed_check(lib:str, required_version:str, default_installed:b
 # libbrotlidec_found = pkgconfig_installed_check('libbrotlidec', BROTLI_REQUIRED_VERSION)
 # libbrotlienc_found = pkgconfig_installed_check('libbrotlienc', BROTLI_REQUIRED_VERSION)
 # libbrotlicommon_found = pkgconfig_installed_check('libbrotlicommon', BROTLI_REQUIRED_VERSION)
-libbrotli_found = pkgconfig_installed_check('libbrotli', BROTLI_REQUIRED_VERSION)
+libbrotli_found = pkgconfig_installed_check('libbrotli')
 
 extension_kwargs = pkgconfig_parse('libbrotli')
+print(f"Extension kwargs: {extension_kwargs}")
 # extension_kwargs['libraries'] = ['libbrotlidec', 'libbrotlienc', 'libbrotlicommon', 'libbrotli']
 extension_kwargs['libraries'] = ['libbrotli']
 
