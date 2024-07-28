@@ -68,7 +68,7 @@ def _parse_pkg_configs(lib: str) -> None:
   For example, the list will look like this at the end:
   [`brotlienc`, `brotlidec`, `brotlicommon`]
   """
-  parsed_lib = pkgconfig.pkgconfig_parse(lib)
+  parsed_lib = pkgconfig.parse(lib)
   ext_kwarg_libraries.append(parsed_lib)
   logger.info(f"Extension kwargs libs: {ext_kwarg_libraries}")
 
