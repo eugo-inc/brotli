@@ -34,6 +34,7 @@ from pkgconfig import parse as pkgconfig_parse
 
 def pkgconfig_installed_check(lib:str, required_version:str, default_installed:bool = False) -> bool:
     installed = default_installed
+    print(pkgconfig_installed(lib, required_version))
     installed = pkgconfig_installed(lib, required_version)
 
     if not default_installed:
