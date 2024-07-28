@@ -36,6 +36,8 @@ def pkgconfig_installed_check(lib:str, required_version:str, default_installed:b
     installed = default_installed
     installed = pkgconfig_installed(lib, required_version)
 
+    print(f"Checking for {lib} installed: {installed}")
+
     if not default_installed:
       raise Exception(f"Required library {lib} not found")
 
@@ -44,7 +46,7 @@ def pkgconfig_installed_check(lib:str, required_version:str, default_installed:b
 # libbrotlidec_found = pkgconfig_installed_check('libbrotlidec', BROTLI_REQUIRED_VERSION)
 # libbrotlienc_found = pkgconfig_installed_check('libbrotlienc', BROTLI_REQUIRED_VERSION)
 # libbrotlicommon_found = pkgconfig_installed_check('libbrotlicommon', BROTLI_REQUIRED_VERSION)
-libbrotli_found = pkgconfig_installed_check('brotli', BROTLI_REQUIRED_VERSION)
+libbrotli_found = pkgconfig_installed_check('libbrotli', BROTLI_REQUIRED_VERSION)
 
 extension_kwargs = pkgconfig_parse('libbrotli')
 # extension_kwargs['libraries'] = ['libbrotlidec', 'libbrotlienc', 'libbrotlicommon', 'libbrotli']
