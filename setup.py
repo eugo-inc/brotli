@@ -7,6 +7,7 @@ import os
 import platform
 import re
 import unittest
+import logging as logger
 
 try:
     from setuptools import Extension
@@ -18,58 +19,80 @@ from distutils.command.build_ext import build_ext
 from distutils import errors
 from distutils import dep_util
 from distutils import log
+import pkgconfig
 
+
+logger.basicConfig(level=logger.INFO)
+
+
+# MARK: - Check to see if we have a suitable libbrotli libraries installed on the system
 
 BROTLI_REQUIRED_VERSION = '>= 1.0.9'
 
-# Check to see if we have a suitable libbrotli libraries installed on the system
-libbrotlidec_found = False
-libbrotlienc_found = False
-libbrotlicommon_found = False
-libbrotli_found = True
+# Define the `libbrotli` libraries we're going to look for on the system
+libs = ['libbrotlidec', 'libbrotlienc', 'libbrotlicommon']
 
+# Default the extension kwargs and ext_kwarg_libraries to an empty dictionary and empty list for us to fill later
+ext_kwargs: dict[str, list[str]] = {}
+ext_kwarg_libraries: list[str] = []
 
-from pkgconfig import installed as pkgconfig_installed
-from pkgconfig import parse as pkgconfig_parse
-import pkgconfig
+def _pkgconfig_installed_check(lib: str, version: str = BROTLI_REQUIRED_VERSION, default_installed: bool = False) -> None:
+    """Check if the given library is installed on the system."""
 
-def pkgconfig_installed_check(lib:str, version:str = BROTLI_REQUIRED_VERSION, default_installed:bool = False) -> bool:
+    # Assign default value to installed (as False)
     installed = default_installed
 
+    # Check if the library exists on the system
     exists = pkgconfig.exists(lib)
-    print(f"Checking if {lib} exists: {exists}")
+    logger.info(f"Checking if {lib} exists: {exists}")
 
+    # Sanity check the library version
     version = pkgconfig.modversion(lib)
-    print(f"Checking lib {lib} version: {version}")
+    logger.info(f"Checking lib {lib} version: {version}")
 
-    installed = pkgconfig_installed(lib, version)
-    print(f"Checking for {lib} installed: {installed}")
+    # Ensure the library is installed on the system
+    installed = pkgconfig.pkgconfig_installed(lib, version)
+    logger.info(f"Checking for {lib} installed: {installed}")
 
+    # If the library is not installed, raise an exception
     if not installed:
       raise Exception(f"Required library {lib} not found")
 
-    return installed
+
+def _parse_pkg_configs(lib: str) -> None:
+  """Parse the pkg-config file for the given library and update the ext_kwarg_libraries list.
+
+  Return the extension kwargs containing the parsed pkg-config file consisting of the names of the
+  libraries that the linker needs to look for.
+
+  For example, the list will look like this at the end:
+  [`brotlienc`, `brotlidec`, `brotlicommon`]
+  """
+  parsed_lib = pkgconfig.pkgconfig_parse(lib)
+  ext_kwarg_libraries.append(parsed_lib)
+  logger.info(f"Extension kwargs libs: {ext_kwarg_libraries}")
 
 
-libs = ['libbrotlidec', 'libbrotlienc', 'libbrotlicommon']
-libs_no_lib = ['brotlidec', 'brotlienc', 'brotlicommon']
-extension_kwargs = {}
-ext_kwarg_libraries = []
+def _find_system_libraries(libs: list[str]) -> None:
+  """Find the system libraries on the system.
 
-for lib in libs:
-  libbrotlidec_found = pkgconfig_installed_check(lib, BROTLI_REQUIRED_VERSION)
-  libbrotlienc_found = pkgconfig_installed_check(lib, BROTLI_REQUIRED_VERSION)
-  libbrotlicommon_found = pkgconfig_installed_check(lib, BROTLI_REQUIRED_VERSION)
+  For each library, check if it is installed on the system and extract the parsed pkg-config file
+  and update the extension kwargs dict with the parsed pkg-config file so the linker knows what to
+  look for.
+  """
+  for lib in libs:
+    # Check if the library is installed on the system
+    _pkgconfig_installed_check(lib, BROTLI_REQUIRED_VERSION)
 
-  extension_kwargs = pkgconfig_parse(lib)
-  extension_kwargs = pkgconfig_parse(lib)
-  extension_kwargs = pkgconfig_parse(lib)
-  print(f"Extension kwargs: {extension_kwargs}")
+    # Parse the pkg-config file for the given library
+    _parse_pkg_configs(lib)
 
-  for p in libs_no_lib:
-    ext_kwarg_libraries.append(p)
 
-extension_kwargs['libraries'] = ext_kwarg_libraries
+_find_system_libraries(libs)
+
+ext_kwargs['libraries'] = ext_kwarg_libraries
+
+
 
 CURR_DIR = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 
@@ -229,7 +252,7 @@ EXT_MODULES = [
         sources=[
             'python/_brotli.c',
             ],
-        **extension_kwargs),
+        **ext_kwargs),
 ]
 
 TEST_SUITE = 'setup.get_test_suite'
