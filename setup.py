@@ -51,7 +51,7 @@ def _pkgconfig_installed_check(lib: str, version: str = BROTLI_REQUIRED_VERSION,
     logger.info(f"Checking lib {lib} version: {version}")
 
     # Ensure the library is installed on the system
-    installed = pkgconfig.pkgconfig_installed(lib, version)
+    installed = pkgconfig.installed(lib, version)
     logger.info(f"Checking for {lib} installed: {installed}")
 
     # If the library is not installed, raise an exception
