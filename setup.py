@@ -65,7 +65,7 @@ for lib in libs:
   extension_kwargs = pkgconfig_parse(lib)
   print(f"Extension kwargs: {extension_kwargs}")
 
-  ext_kwarg_libraries.append(lib)
+  ext_kwarg_libraries.append(['brotlidec', 'brotlienc', 'brotlicommon'])
 
 extension_kwargs['libraries'] = ext_kwarg_libraries
 
