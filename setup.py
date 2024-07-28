@@ -47,7 +47,6 @@ def pkgconfig_installed_check(lib:str, required_version:str, default_installed:b
 libbrotli_found = pkgconfig_installed_check('brotli', BROTLI_REQUIRED_VERSION)
 
 extension_kwargs = pkgconfig_parse('libbrotli')
-print(extension_kwargs)
 # extension_kwargs['libraries'] = ['libbrotlidec', 'libbrotlienc', 'libbrotlicommon', 'libbrotli']
 extension_kwargs['libraries'] = ['libbrotli']
 
